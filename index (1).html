@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6dde0">
+<meta name="robots" content="noindex, nofollow">
+<title>A letter for you</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💌</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Pinyon+Script&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg-top: #fbeaea;
+    --bg-bottom: #f1cdd3;
+    --env-back: #e3a5b0;
+    --env-side: #eeb9c1;
+    --env-bottom: #f6d3d7;
+    --env-flap: #e9afb9;
+    --env-inside: #f8dfe1;
+    --seam: #d98f9c;
+    --paper: #fffbf8;
+    --ink: #4a2f3a;
+    --wax: #a8283f;
+    --wax-dark: #7d1a2d;
+    --script: 'Pinyon Script', 'Snell Roundhand', 'Apple Chancery', cursive;
+    --serif: 'EB Garamond', Garamond, Georgia, 'Times New Roman', serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  * { -webkit-tap-highlight-color: transparent; }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: var(--serif);
+    color: var(--ink);
+    background: linear-gradient(170deg, var(--bg-top), var(--bg-bottom));
+    background-attachment: fixed;
+    overflow: hidden;
+  }
+
+  svg { display: block; }
+
+  /* ---------- Envelope stage ---------- */
+
+  .stage {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 34px;
+    padding: 24px;
+    transition: opacity .6s ease, transform .6s ease;
+  }
+
+  .reading .stage {
+    opacity: 0;
+    transform: scale(.96);
+    pointer-events: none;
+  }
+
+  .envelope {
+    --w: min(84vw, 380px);
+    position: relative;
+    width: var(--w);
+    height: calc(var(--w) * .68);
+    perspective: 1100px;
+    cursor: pointer;
+    outline: none;
+    filter: drop-shadow(0 18px 22px rgba(120, 50, 70, .28));
+  }
+
+  .envelope:focus-visible {
+    outline: 3px solid var(--wax);
+    outline-offset: 10px;
+    border-radius: 8px;
+  }
+
+  .env-back, .paper, .env-front, .to, .flap, .seal { position: absolute; }
+
+  .env-back {
+    inset: 0;
+    background: var(--env-back);
+    border-radius: 6px;
+    z-index: 1;
+  }
+
+  /* the letter peeking out */
+  .paper {
+    left: 6%;
+    right: 6%;
+    top: 7%;
+    height: 82%;
+    background: var(--paper);
+    border-radius: 4px;
+    z-index: 2;
+    transition: transform .8s cubic-bezier(.25, .7, .2, 1);
+  }
+
+  .paper::before {
+    content: "";
+    position: absolute;
+    left: 12%;
+    right: 12%;
+    top: 14%;
+    height: 44%;
+    background: repeating-linear-gradient(to bottom, rgba(168, 40, 63, .16) 0 2px, transparent 2px 13px);
+  }
+
+  .env-front {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+  }
+
+  .to {
+    left: 50%;
+    bottom: 8%;
+    transform: translateX(-50%);
+    z-index: 3;
+    font-family: var(--script);
+    font-size: calc(var(--w) * .075);
+    line-height: 1;
+    color: var(--wax-dark);
+    white-space: nowrap;
+  }
+
+  .flap {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 55.9%;
+    z-index: 4;
+    transform-origin: top center;
+    transform-style: preserve-3d;
+    transition: transform .7s ease .5s, z-index 0s .85s;
+  }
+
+  .face {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  .face.in { transform: rotateY(180deg); }
+
+  .seal {
+    left: 50%;
+    top: 55.9%;
+    width: calc(var(--w) * .17);
+    height: calc(var(--w) * .17);
+    z-index: 5;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #d44a60, var(--wax) 55%, var(--wax-dark));
+    box-shadow: 0 3px 6px rgba(60, 10, 25, .45), inset 0 -2px 4px rgba(60, 10, 25, .35);
+    display: grid;
+    place-items: center;
+    transform: translate(-50%, -50%);
+    transition: opacity .4s ease .9s;
+    animation: beat 2.2s ease-in-out infinite;
+  }
+
+  .seal svg { width: 48%; height: 48%; fill: rgba(255, 225, 230, .92); filter: drop-shadow(0 1px 0 rgba(60, 10, 25, .5)); }
+
+  @keyframes beat {
+    0%, 55%, 100% { transform: translate(-50%, -50%) scale(1); }
+    62% { transform: translate(-50%, -50%) scale(1.12); }
+    70% { transform: translate(-50%, -50%) scale(1); }
+    78% { transform: translate(-50%, -50%) scale(1.08); }
+  }
+
+  .hint {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 19px;
+    letter-spacing: .02em;
+    color: rgba(74, 47, 58, .75);
+    transition: opacity .4s ease;
+  }
+
+  /* open state */
+  .open .flap {
+    transform: rotateX(180deg);
+    z-index: 0;
+    transition: transform .7s ease, z-index 0s .35s;
+  }
+
+  .open .paper {
+    transform: translateY(-60%);
+    transition: transform .9s cubic-bezier(.25, .7, .2, 1) .45s;
+  }
+
+  .open .seal {
+    opacity: 0;
+    animation: none;
+    transition: opacity .25s ease;
+  }
+
+  .open .hint { opacity: 0; }
+
+  /* ---------- The letter ---------- */
+
+  .letter-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    outline: none;
+    padding:
+      max(18px, env(safe-area-inset-top))
+      max(14px, env(safe-area-inset-right))
+      max(32px, env(safe-area-inset-bottom))
+      max(14px, env(safe-area-inset-left));
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(28px);
+    transition: opacity .7s ease, transform .8s cubic-bezier(.2, .7, .2, 1), visibility 0s .8s;
+  }
+
+  .reading .letter-layer {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition-delay: 0s;
+  }
+
+  .letter {
+    position: relative;
+    max-width: 640px;
+    margin: 0 auto;
+    background: var(--paper);
+    border-radius: 6px;
+    padding: clamp(40px, 9vw, 72px) clamp(26px, 8vw, 72px) clamp(34px, 7vw, 56px);
+    box-shadow: 0 24px 50px rgba(120, 50, 70, .2), 0 2px 6px rgba(120, 50, 70, .12);
+  }
+
+  .letter::before {
+    content: "";
+    position: absolute;
+    inset: 10px;
+    border: 1px solid rgba(168, 40, 63, .2);
+    border-radius: 3px;
+    pointer-events: none;
+  }
+
+  .salutation {
+    font-family: var(--script);
+    font-size: clamp(38px, 10.5vw, 54px);
+    line-height: 1.15;
+    color: var(--wax);
+    margin-bottom: .55em;
+  }
+
+  .letter p {
+    font-size: clamp(18px, 4.9vw, 21px);
+    line-height: 1.75;
+    margin-bottom: 1.25em;
+    text-wrap: pretty;
+  }
+
+  .letter p.closing {
+    font-family: var(--script);
+    font-size: clamp(28px, 7.6vw, 36px);
+    line-height: 1.35;
+    color: var(--wax);
+    margin: 1.4em 0 0;
+    text-align: center;
+  }
+
+  .divider {
+    display: flex;
+    justify-content: center;
+    margin: 30px 0 26px;
+  }
+
+  .divider svg { width: 22px; height: 22px; fill: var(--wax); opacity: .8; }
+
+  .close-wrap { display: flex; justify-content: center; }
+
+  .close-btn {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-style: italic;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid rgba(74, 47, 58, .35);
+    border-radius: 999px;
+    padding: 10px 26px;
+    cursor: pointer;
+    transition: background .2s ease, border-color .2s ease;
+  }
+
+  .close-btn:hover { background: rgba(168, 40, 63, .08); border-color: rgba(168, 40, 63, .5); }
+  .close-btn:focus-visible { outline: 3px solid var(--wax); outline-offset: 3px; }
+
+  /* short landscape phones */
+  @media (max-height: 480px) {
+    .envelope { --w: min(54vw, 260px); }
+    .stage { gap: 22px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .seal { animation: none; }
+    .stage, .letter-layer, .paper, .flap { transition-duration: .01s !important; transition-delay: 0s !important; }
+  }
+</style>
+</head>
+
+<body>
+
+<main class="stage" id="stage">
+  <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="A letter for you. Tap to open it.">
+    <div class="env-back"></div>
+    <div class="paper" aria-hidden="true"></div>
+
+    <svg class="env-front" viewBox="0 0 300 204" aria-hidden="true">
+      <polygon points="0,0 150,114 0,204" fill="var(--env-side)" stroke="var(--seam)" stroke-width="1" stroke-linejoin="round"/>
+      <polygon points="300,0 150,114 300,204" fill="var(--env-side)" stroke="var(--seam)" stroke-width="1" stroke-linejoin="round"/>
+      <polygon points="0,204 150,114 300,204" fill="var(--env-bottom)" stroke="var(--seam)" stroke-width="1" stroke-linejoin="round"/>
+    </svg>
+
+    <span class="to" aria-hidden="true">For BunBun</span>
+
+    <div class="flap" aria-hidden="true">
+      <svg class="face out" viewBox="0 0 300 114" preserveAspectRatio="none">
+        <polygon points="0,0 300,0 150,114" fill="var(--env-flap)" stroke="var(--seam)" stroke-width="1" stroke-linejoin="round"/>
+      </svg>
+      <svg class="face in" viewBox="0 0 300 114" preserveAspectRatio="none">
+        <polygon points="0,0 300,0 150,114" fill="var(--env-inside)" stroke="var(--seam)" stroke-width="1" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <span class="seal" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    </span>
+  </div>
+
+  <p class="hint">tap to open</p>
+</main>
+
+<section class="letter-layer" id="layer" tabindex="-1" aria-label="Your letter">
+  <article class="letter">
+    <p class="salutation">My dearest BunBun,</p>
+
+    <p>i write this with honestly nothing but warmth and appreciation in my heart for your entire existence. I should begin by wishing the warmest absolutely happiest birthday ever to you. I would fail to express with words how much you deserve all the happiness, joys, prosperity and pleasures that should come to you on your special day because you are simply that much of a gift to every single person around you.</p>
+
+    <p>Pardon my overly formal dialect sometimes but this honestly seems like the best way I can express myself, although whichever form of speech I may use I really doubt i could ever capture the entireity of the surreal and beautiful essense you absolutely radiate just by existing you know. Those aren't just big vague words i genuinely mean it.</p>
+
+    <p>To me at least your presence alone- every single day feels like it lights up something within my life doing the simplest of things like as little as just getting to interact with you brightens and lifts me up regardless of what sort of a day I might be having. It occurred to me you are just that way! Maybe this might be just be a long winded way of saying you're incredibly pleasant to be with but that one sentence doesn't feel like it does nearly as much justice to how much praise you deserve. Others close to you just feel that way too! Particularly those who are fortunate enough to get to share your presence in reality.</p>
+
+    <p>I really could go on and on about all the ways you make my life more pleasant to live in just starting from the care you show about my wellbeing, how you remind me each time that i have someone so precious to speak my mind to, someone that would honestly be willing to do so much for the sake of me and others, how much you show that you appreciate my presence, i really love being with you too :)</p>
+
+    <p>I do NOT want to downplay on the care you express so let me really appreciate and tell you how much i value it. It's in the little things... for instance you being worried when I express i don't feel great, staying with me and reassuring me about something that may be worrying me, celebrating something alongside me whenever i have a little achievement, just always being uplifting and urging me to do my best at everything.</p>
+
+    <p>I really want to talk about how much you did to even make my own birthday feel special. It really felt so different for me this year thanks to entirely you. The thing that particularly touched me the most was the little card with the note you had written for me. It's just... hard to express with words but know that it actually makes my heart cry tears of joy whenever I recall it, that is literally how it feels to me.</p>
+
+    <p>I do not lie when I say nothing brings me greater joy than picturing your smiling face in my mind I can actually feel it across my entire self I feel my face lighten up, there's a warm feeling in my heart, my body immediately... relaxes? Is that the right word? But just know it's a pleasant feeling, and its something i really do not want to let go of and i can really feel linger for a moment. It feels criminal to not appreciate how beautiful and gorgeous you are and really I want to say how fortunate I feel every single time you decide to send a picture or little recording my way. You're prettier than i could ever reasonably convey, inside and out. Fortunate is putting it lightly in fact I am mentally screaming my heart is doing backflips I am barely containing my excitement and I just have the silliest grin on my face ahaha.</p>
+
+    <p>I really want to point out how much of an absolutely amazing person you are in general and not just in your interactions with others. I truly, really hold so much admiration for you. For your capacity to never give in to the pressure of others and even managing to persevere through any and really so many circumstances that might seriously affect people for life, yet you seem to go through much yet manage to live through it with so much warmth and charm and the smile of a literal angel most days. Your resilience and strength is something i know i have said i greatly admire plenty of times but it just never feels enough because i keep being even more fascinated the more I learn about you. You pick up things so soon, you are great at so many areas, you have a beautiful mind in the sense of the things it comes up with and genuinely just how sharp, grounded and thoughtful your reasoning always is. You approach things with such astonishing will and clarity it has always felt beyond amazing to me.</p>
+
+    <p>Honestly, to me you really seem close to what an angel descending from heaven would be like had they taken up the form of a human and were living among us commoners. It is really how I feel I am not exaggerating. If you aren't an angel how would you describe someone's such an amazing ability to simply light up everyone around them just by their presence alone you are magical it feels magical but I don't want to overlook its genuinely thanks to how nice and caring you are as a person and just how much thought you put in for the sake of everyone else it really really deserves so much appreciation.</p>
+
+    <p>Thank you for existing really, it may be a peculiar thing to thank someone about but I like to express appreciation where it's due and deserving. All of that said, i genuinely wish you have the happiest and the most pleasant birthday ever my sweetest baby.</p>
+
+    <p class="closing">Mwah, I love you :) i truly wish you a day that's as beautiful and amazing as you are</p>
+
+    <div class="divider" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    </div>
+
+    <div class="close-wrap">
+      <button class="close-btn" id="close" type="button">Close the letter</button>
+    </div>
+  </article>
+</section>
+
+<script>
+  (function () {
+    var stage = document.getElementById('stage');
+    var envelope = document.getElementById('envelope');
+    var layer = document.getElementById('layer');
+    var closeBtn = document.getElementById('close');
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var busy = false;
+    var isOpen = false;
+
+    function openLetter() {
+      if (busy || isOpen) return;
+      busy = true;
+      stage.classList.add('open');
+      setTimeout(function () {
+        document.body.classList.add('reading');
+        isOpen = true;
+        busy = false;
+        layer.scrollTop = 0;
+        try { layer.focus({ preventScroll: true }); } catch (e) {}
+      }, reduce ? 50 : 1500);
+    }
+
+    function closeLetter() {
+      if (busy || !isOpen) return;
+      busy = true;
+      document.body.classList.remove('reading');
+      setTimeout(function () {
+        stage.classList.remove('open');
+        layer.scrollTop = 0;
+        isOpen = false;
+        busy = false;
+        envelope.focus({ preventScroll: true });
+      }, reduce ? 50 : 700);
+    }
+
+    envelope.addEventListener('click', openLetter);
+    envelope.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openLetter();
+      }
+    });
+    closeBtn.addEventListener('click', closeLetter);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeLetter();
+    });
+  })();
+</script>
+
+</body>
+</html>
